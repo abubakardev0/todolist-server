@@ -40,12 +40,16 @@ router.post("/", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
-  const id = req.params.id;
-  try {
-    await todoRepository.remove(id);
-    res.sendStatus(204);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  const entityId = req.params.id;
+  if (!entityId) {
+    res.sendStatus(400);
+  } else {
+    try {
+      await todoRepository.remove(entityId);
+      res.sendStatus(204);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   }
 });
 
