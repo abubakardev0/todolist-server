@@ -56,7 +56,7 @@ router.delete("/:id", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   const entityId = req.params.id;
   const status = req.body.status;
-  if (!entityId || !status) {
+  if (!entityId || status === null || status === undefined) {
     res.sendStatus(400);
   } else {
     try {
