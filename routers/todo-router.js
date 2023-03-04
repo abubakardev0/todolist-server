@@ -23,18 +23,18 @@ router.post("/", async (req, res) => {
   const { task, completed, created_at, completed_at } = req.body;
   const trimmedTask = task.trim();
   if (!trimmedTask) {
-    res.sendStatus(400);
+    res.status(400).json({ message: "Make sure your todo task is valid!" });
   } else {
     try {
       await todoRepository.createAndSave({
         task: trimmedTask,
-        completed,
-        created_at,
-        completed_at,
+        completed: completed ?? false,
+        created_at: created_at ?? new Date(),
+        completed_at: completed_at ?? null,
       });
       res.sendStatus(201);
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: "Error while creating a todo task!" });
     }
   }
 });
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const entityId = req.params.id;
   if (!entityId) {
-    res.sendStatus(400);
+    res.status(400).json({ message: "Todo task id not found!" });
   } else {
     try {
       await todoRepository.remove(entityId);
@@ -56,8 +56,14 @@ router.delete("/:id", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   const entityId = req.params.id;
   const status = req.body.status;
-  if (!entityId || status === null || status === undefined) {
-    res.sendStatus(400);
+  if (!entityId) {
+    res.status(400).json({ message: "Todo task id not found!" });
+  } else if (
+    typeof status !== "boolean" ||
+    status === null ||
+    status === undefined
+  ) {
+    res.status(400).json({ message: "Unable to find your todo task status!" });
   } else {
     try {
       const todo = await todoRepository.fetch(entityId);
